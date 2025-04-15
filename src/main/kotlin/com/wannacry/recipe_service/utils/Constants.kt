@@ -10,6 +10,8 @@ object Auth {
     const val TYPE = "type"
     const val PREFIX_BEARER = "Bearer "
     const val AUTHORIZATION = "Authorization"
+    const val REGISTER = "register"
+    const val LOGIN = "login"
 }
 
 object Documents {
