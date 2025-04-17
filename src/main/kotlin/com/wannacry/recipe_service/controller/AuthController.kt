@@ -4,11 +4,12 @@ import com.wannacry.recipe_service.database.model.AuthRequest
 import com.wannacry.recipe_service.database.model.RefreshRequest
 import com.wannacry.recipe_service.database.model.data.TokenPair
 import com.wannacry.recipe_service.security.AuthService
-import com.wannacry.recipe_service.utils.Auth.LOGIN
-import com.wannacry.recipe_service.utils.Auth.REFRESH
-import com.wannacry.recipe_service.utils.Auth.REGISTER
+import com.wannacry.recipe_service.utils.Route.AUTH
+import com.wannacry.recipe_service.utils.Route.LOGIN
+import com.wannacry.recipe_service.utils.Route.REFRESH
+import com.wannacry.recipe_service.utils.Route.REGISTER
 import jakarta.validation.Valid
-import org.apache.naming.ResourceRef.AUTH
+
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping

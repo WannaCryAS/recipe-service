@@ -18,3 +18,11 @@ object Documents {
     const val USER = "users"
     const val REFRESH_TOKEN = "refresh_token"
 }
+
+object Route {
+    const val AUTH = "/auth"
+    const val REGISTER = "/register"
+    const val LOGIN = "/login"
+    const val REFRESH = "/refresh"
+
+}
