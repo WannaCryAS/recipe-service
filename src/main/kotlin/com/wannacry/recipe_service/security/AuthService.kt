@@ -1,14 +1,20 @@
 package com.wannacry.recipe_service.security
 
+import com.wannacry.recipe_service.database.model.LoginResponse
+import com.wannacry.recipe_service.database.model.RegisterRequest
 import com.wannacry.recipe_service.database.model.data.RefreshToken
+import com.wannacry.recipe_service.database.model.RegisterResponse
 import com.wannacry.recipe_service.database.model.data.TokenPair
 import com.wannacry.recipe_service.database.model.data.User
 import com.wannacry.recipe_service.database.repository.RefreshTokenRepository
 import com.wannacry.recipe_service.database.repository.UserRepository
+import com.wannacry.recipe_service.utils.General.HASH
+import com.wannacry.recipe_service.exception.EmailAlreadyExistsException
+import com.wannacry.recipe_service.exception.InvalidCredentialsException
+import com.wannacry.recipe_service.utils.ApiCode.EMAIL_ALREADY_EXISTS
+import com.wannacry.recipe_service.utils.ApiCode.INVALID_CREDENTIALS
 import org.bson.types.ObjectId
-import org.springframework.http.HttpStatus
 import org.springframework.http.HttpStatusCode
-import org.springframework.security.authentication.BadCredentialsException
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.server.ResponseStatusException
@@ -25,39 +31,44 @@ class AuthService(
 ) {
 
     fun register(
-        email: String,
-        password: String
-    ): User {
-        val user = userRepository.findByEmail(email.trim())
-        if (user != null) {
-            throw ResponseStatusException(HttpStatus.CONFLICT, "A user with that email already exists.")
+       request: RegisterRequest
+    ): RegisterResponse {
+
+        if (userRepository.existsByEmail(request.email)) {
+            throw EmailAlreadyExistsException(EMAIL_ALREADY_EXISTS.description)
         }
-        return userRepository.save(
-            User(
-                email = email,
-                hashPassword = hashEncoder.encode(password)
-            )
+        val hashedPassword = hashEncoder.encode(request.password)
+        val user = User(
+            name = request.name,
+            email = request.email,
+            hashPassword = hashedPassword
+        )
+        val savedUser = userRepository.save(user)
+
+        return RegisterResponse(
+            userId = savedUser.id.toHexString(),
+            name = savedUser.name,
+            email = savedUser.email
         )
     }
 
     fun login(email: String,
               password: String
-    ): TokenPair {
+    ): LoginResponse {
         val user = userRepository.findByEmail(email)
-            ?: throw BadCredentialsException("Invalid Credentials.")
+            ?: throw InvalidCredentialsException(INVALID_CREDENTIALS.description)
 
         if (!hashEncoder.matches(password, user.hashPassword)) {
-            throw BadCredentialsException("Invalid Credentials.")
+            throw InvalidCredentialsException(INVALID_CREDENTIALS.description)
         }
 
         val newAccessToken = jwtService.generateAccessToken(user.id.toHexString())
         val newRefreshToken = jwtService.generateRefreshToken(user.id.toHexString())
 
-        storeRefreshToken(user.id, newRefreshToken)
-
-        return TokenPair(
-            accessToken = newAccessToken,
-            refreshToken = newRefreshToken
+        return LoginResponse(
+            token = newAccessToken,
+            email = user.email,
+            name = user.name
         )
     }
 
@@ -108,7 +119,7 @@ class AuthService(
     }
 
     private fun hashToken( token: String): String {
-        val digest = MessageDigest.getInstance("SHA-256")
+        val digest = MessageDigest.getInstance(HASH)
         val hashBytes = digest.digest(token.encodeToByteArray())
         return Base64.getEncoder().encodeToString(hashBytes)
 

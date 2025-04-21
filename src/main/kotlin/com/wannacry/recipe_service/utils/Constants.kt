@@ -2,6 +2,8 @@ package com.wannacry.recipe_service.utils
 
 object General {
     const val EXPIRE_AFTER = "0s"
+    const val HASH = "SHA-256"
+    const val REGEX = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\\\d).{8,}\\\$"
 }
 
 object Auth {
@@ -10,8 +12,6 @@ object Auth {
     const val TYPE = "type"
     const val PREFIX_BEARER = "Bearer "
     const val AUTHORIZATION = "Authorization"
-    const val REGISTER = "register"
-    const val LOGIN = "login"
 }
 
 object Documents {

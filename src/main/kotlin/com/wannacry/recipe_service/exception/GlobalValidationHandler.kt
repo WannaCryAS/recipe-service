@@ -1,4 +1,4 @@
-package com.wannacry.recipe_service
+package com.wannacry.recipe_service.exception
 
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.MethodArgumentNotValidException
